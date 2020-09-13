@@ -87,9 +87,10 @@ cargo --version
 cargo new $project_name
 ```
 
-A directory called $project_name is created with a git repo, a Cargo.toml file
-analagous to a package.json in Node.js, a src directory meant for your source
-code files, and a target directory meant for your build artifacts.
+A directory called $project_name is created with a git repo (unless already
+inside a git repo), a Cargo.toml file analagous to a package.json in Node.js,
+a src directory meant for your source code files, and a target directory meant
+for your build artifacts.
 
 ## Building a Cargo project
 
