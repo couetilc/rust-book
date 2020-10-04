@@ -34,14 +34,14 @@ fastest (even on 64-bit systems). Signed numbers are stored using two's
 complement representation.
 
 NOTE: Two's complement is the binary system where a N-bit number summed with
-it's negative representation equal the number 2^N.  Practically, this scheme is useful
-as addition, subtraction, and multiplication will operate the same on positive
-and negative numbers. Exceptionally, the most negative number in any N-bit two's
-complement scheme cannot be inverted, as its inversion will result in itself
-again, in the same sense as how +0 and -0 are the same number. Take care to
-account for the most negative number phenomenon in numerical calculations.
-As an example of two's complement representation, take +3 (011) and -3 (101).
-When added, 011 + 101 = 1000, equivalent to 8 in base 10 or 2^3.
+it's negative representation equalls the number 2^N.  Practically, this scheme
+is useful as addition, subtraction, and multiplication will operate the same on
+positive and negative numbers. Exceptionally, the most negative number in any
+N-bit two's complement scheme cannot be inverted, as its inversion will result
+in itself again, in the same sense as how +0 and -0 are the same number. Take
+care to account for the most negative number phenomenon in numerical
+calculations.  As an example of two's complement representation, take +3 (011)
+and -3 (101).  When added, 011 + 101 = 1000, equivalent to 8 in base 10 or 2^3.
 
 ##### Integer Overflow
 
