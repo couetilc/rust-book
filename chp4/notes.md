@@ -13,17 +13,17 @@ rules the compiler checks at compile time.
 
 Whether a value is on the stack or heap affects how the language behaves and
 what decisions you can make. They are different structures of memory, the stack
-stores values in one order, and retrieves them in the reverse order, AKA
+stores values in one order, and retrieves them in the reverse order, in this case
 "first-in last-out". All data stored on the stack must have a known, fixed size.
 If you have data whose size changes or is unknown, you must request a certain
 amount of memory on the heap. The memory allocator in Rust returns a pointer to
 a spot in the heap and marks it as used, AKA "allocating on the heap".
 
-Pushing to the stack is faaster than allocating on the heap because stacks do
+Pushing to the stack is faster than allocating on the heap because stacks do
 not need to search for an empty spot, they place it on the top of the stack.
 There is more bookkeeping with heap operations. Memory access is slower too,
 following pointers can cause a processor to jump around in memory inefficiently
-and allocating a big portion of the heap can take time. Functions calls push
+and allocating a big portion of the heap can take time. Function calls push
 their local variables onto the stack at execution and pop them off afterwards.
 
 Ownership addresses problems with tracking access to the same memory at
@@ -57,7 +57,7 @@ final executable.
 
 To allocate memory for a mutable and growable piece of text
 1) the memory must be requested from the memory allocator at runtime
-2) the memory must be returned to the memory allocated when it becomes unused
+2) the memory must be returned to the memory allocator when it becomes unused
 
 `String` allocation can be performed in Rust by calling `String::from` on a
 string literal. Rust ties deallocation to variable scope. Once a variable on
@@ -107,3 +107,49 @@ you assigned the value to another variable, that is, moved it.
 Passing ownership around by returning pointer variables from functions is
 tedious and clunky, but Rust has a feature called "references" that addresses
 this issue with passing heap data to functions.
+
+## References and Borrowing
+
+You can passed a variable allocated on the heap to a function by "reference" and
+ownership will not be transferred. The value has been "borrowed", and will be
+returned to the parent scope. You can denote a reference of a value to prepending
+an ampersand to the type. A reference is a pointer to the pointer for a value on
+the heap. Whereas a String pointer for a heap-allocated string would contain
+the memory address, length, and capacity, the reference, another pointer, would
+just contain the memory address of the String pointer.
+
+Note: The opposite of referencing by `&` is "dereferencing" by using `*`.
+
+Remember, a variable is only dropped when the reference that owns it goes out
+of scope, not when any borrows go out of scope. When you borrow a value as a
+reference, by default it will be immutable, just like variables. Declare a
+variable as mutable using `mut` and pass it as mutable using `&mut`.
+
+## Mutable References
+
+Mutable references can only have one reference for a piece of data in the same
+scope. This restriction prevents data races, where a program may have two
+different code blocks access the memory at the same time, causing undefined
+behavior when there is no coordination. Rust's rules prevent this data race
+altogether, and while mutable references are restricted to one per scope, a
+single scope can have innumerable immutable references to the same data in the
+same scope. Remember that a variable's scope extends to the last time it is
+used, no further, so keep this in mind when mixing mutable and immutable
+references in the same scope.
+
+## Dangling References
+
+`dangling pointers` are pointers that reference a deallocated portion of memory.
+In a sense, pointers are pointing to a pointer that has been deallocated and
+possibly reallocated, allowing code using the dangling pointer to access
+memory it may not have permission to access. Rust requires that data cannot go
+out of scope before its references do.
+
+## The Rules of References
+
+Recap
+1. At any given time, you can have either one mutable reference or any number
+   of immutable references.
+2. References must always be valid
+
+
