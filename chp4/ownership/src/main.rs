@@ -1,3 +1,5 @@
+#![allow(dead_code)]
+
 fn main() {
     // after shallow copy of string reference, borrow error occurs when old value is used, as
     // Strings are allocated on the stack and implement Drop trait
@@ -74,6 +76,61 @@ fn main() {
     // // because the String was not borrowed and went out of scope.
     // let reference_to_nothing = dangle();
     // let reference_to_something = no_dangle(): // borrows the string by moving its pointer
+
+    // // String slices
+    // let s = String::from("hello world"); // String pointer with memory address,
+    //                                      // length, and capacity stored
+    // let hello = &s[0..5]; // String slice with memory address and length stored
+    // let world = &s[6..11];
+    // let hello2 = &s[..5]; // (equivalent to previous statements)
+    // let world2 = &s[6..];
+
+    // // error, because borrowing an immutable referene then using it after a
+    // // mutable borrow occurs during the ".clear()" call.
+    // let mut s = String::from("hello world");
+    // let word = first_word(&s);
+    // s.clear();
+    // println!("the first word is: {}", word);
+
+    // // string literals are slices, s is type &str
+    // let s = "Hello, world!";
+
+    // as string literals are string slices, lets make our api for first_word
+    // more flexible by have accept a slice parameter instead of a string pointer
+    fn first_word(s: &str) -> &str {
+        for (i, &item) in s.as_bytes().iter().enumerate() {
+            if item == b' ' {
+                return &s[0..i];
+            }
+        }
+        &s[..]
+    }
+    first_word("hello world");
+    first_word(&String::from("hello world")[..]);
+
+    // // other slices
+    // let a = [1, 2, 3, 4, 5];
+    // let slice = &a[1..3]; // type "&[i32]"
+
+    // TODO program for once this chapter is over that takes a corpus of text
+    // and calculates statistics on word frequency
+}
+
+// write a function that takesa string and returns the first word it finds
+// in that string (a string with no spaces must be entirely one word)
+// "&str" is the type for a "string slice".
+fn first_word(s: &String) -> &str {
+    let bytes = s.as_bytes();
+    // (i, &item) are a pattern desctructuring of the tuple returned by enumerate.
+    // iter() returns each element in a collection, while enumerate takes each
+    // element and maps it to a tuple with the index of, and a reference to, the element
+    for (i, &item) in bytes.iter().enumerate() {
+        if item == b' ' {
+            return &s[0..i];
+        }
+    }
+
+    &s[..]
 }
 
 fn no_dangle() -> String {
@@ -81,10 +138,11 @@ fn no_dangle() -> String {
     s
 }
 
-fn dangle() -> &String {
-    let s = String::from("hello");
-    &s
-}
+// returns a dangling reference, will not compile
+// fn dangle() -> &String {
+//     let s = String::from("hello");
+//     &s
+// }
 
 fn change(some_string: &mut String) { // must declare as mutable in order to modify String
     some_string.push_str(", world");

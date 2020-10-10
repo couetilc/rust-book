@@ -112,7 +112,7 @@ this issue with passing heap data to functions.
 
 You can passed a variable allocated on the heap to a function by "reference" and
 ownership will not be transferred. The value has been "borrowed", and will be
-returned to the parent scope. You can denote a reference of a value to prepending
+returned to the parent scope. You can denote a reference of a value by prepending
 an ampersand to the type. A reference is a pointer to the pointer for a value on
 the heap. Whereas a String pointer for a heap-allocated string would contain
 the memory address, length, and capacity, the reference, another pointer, would
@@ -123,7 +123,7 @@ Note: The opposite of referencing by `&` is "dereferencing" by using `*`.
 Remember, a variable is only dropped when the reference that owns it goes out
 of scope, not when any borrows go out of scope. When you borrow a value as a
 reference, by default it will be immutable, just like variables. Declare a
-variable as mutable using `mut` and pass it as mutable using `&mut`.
+variable as mutable using `mut` and pass it as a mutable reference using `&mut`.
 
 ## Mutable References
 
@@ -150,6 +150,61 @@ out of scope before its references do.
 Recap
 1. At any given time, you can have either one mutable reference or any number
    of immutable references.
-2. References must always be valid
+2. References must always be valid, that is, the memory they point to cannot be
+   deallocated before all its references have been.
 
+## The Slice Type
 
+A "slice" references a contiguous sequence of elements in a collection without
+having ownership over the whole collection. Consider a function that finds the
+first word in a string. What should it return? It could return an index to the
+last character in that word, so it may be references as from the start of the
+string to the ending index, but then this last index exists as a variable
+separate from the string within which it has contextual meaning, which means
+different ownership and scoping rules.
+
+## String Slices
+
+Rust's solution to this disconnect is the string slice, which is a reference
+data type that stores the address and length of a portion of a string. You can
+declare a string slice by prepending `&` to a String pointer and appending
+brackets denoting a range to reference, `[start_index..end_index]`, e.g.
+`&String::from("hello")[1..3] // "el"`
+
+Rust's `..` range syntax allows you to drop the first or last index number,
+which will default to 0 and the length, respectively.
+
+If you return a slice representing the first word of a string, the slice is a
+reference to a portion of the passed String, and therefore takes advantage of
+Rust's rules concerning ownership and borrowing. If the slice is an immutable
+reference to a string, then there can be no mutable borrows of the original
+string while that slice is being used, stopping issues with slices referring to
+mutated issues at compile time, rather than having them happen silently during
+runtime.
+
+## String Literals are Slices
+
+A string literal is in fact a slice that points to a memory address in the final
+binary, where the string was stored. A string literal's type is `&str`, an
+immutable reference. Note that you can take slices of string literals using the
+same syntax, `let s = "hello"; let slice = &s[..2]; // "he"`
+
+## String Slices as Parameters
+
+Considering string literals are slices, and Strings can be cast into slices, we
+can improve the first_name function's API. Instead of accept a string pointer as
+a parameter, it can accept a string slice, and thus accept literals as well as
+heap-allocated strings.
+
+## Other Slices
+
+There are more general slices, such as for arrays, which may have a type that
+looks like `&[i32]` and may be declared in the same form as a string slice.
+These slices are also stored and represented by a memory address and a length.
+
+## Summary
+
+Ownership, borrowing, and slices are methods Rust uses to ensure memory safety
+of programs at compile time. While Rust allows control over memory usage like
+other system programming languages, it's rules require that data is properly
+allocated, used, then deallocated.
